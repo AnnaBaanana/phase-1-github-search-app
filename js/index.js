@@ -1,31 +1,6 @@
 const userSearchURL = "https://api.github.com/search/users?q="
 let param;
 
-//working renderData not dynamic
-/*function renderData() {
-    fetch(`${userSearchURL}+${param}`, {
-        headers: {
-            "Accept": "application/vnd.github.v3+json"
-        }
-    }).then(res => res.json()).then(data => {
-        const userData = data.items.forEach((element) => {
-            let userList = document.querySelector("#user-list")
-            const div = document.createElement("div")
-            div.className = "users"
-            div.id = `${element.login}`
-            const h4 = document.createElement("h4")
-            h4.textContent = element.login
-            const img = document.createElement("img")
-            img.className = "avatar"
-            img.src = element.avatar_url
-            const p = document.createElement("p")
-            div.append(h4, img)
-            userList.append(div)
-        })
-        expandUser()
-    })
-}*/
-
 //working renderData with separate createUser
 function renderData() {
     console.log('Ready to render')
@@ -36,6 +11,8 @@ function renderData() {
             "Accept": "application/vnd.github.v3+json"
         }
     }).then(res => res.json()).then(data => {
+        console.log(data)
+        removeAllChildNodes(userList)
         data.items.forEach((element) => {
             userList.append(createUser(element))
     })})
@@ -54,6 +31,12 @@ function createUser(element) {
     const p = document.createElement("p")
     div.append(h4, img)
     return div
+}
+
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
 }
 
 function searchUser() {
