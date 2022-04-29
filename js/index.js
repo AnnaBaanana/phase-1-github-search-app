@@ -1,21 +1,18 @@
 const userSearchURL = "https://api.github.com/search/users?q="
 let param;
-//const form = document.querySelector("#github-form")
-//console.log(form)
 
-
-function renderData() {
-    console.log(`${userSearchURL}+${param}`)
+//working renderData not dynamic
+/*function renderData() {
     fetch(`${userSearchURL}+${param}`, {
         headers: {
             "Accept": "application/vnd.github.v3+json"
         }
     }).then(res => res.json()).then(data => {
-        console.log(data.items)
         const userData = data.items.forEach((element) => {
-            console.log(element.login)
             let userList = document.querySelector("#user-list")
-            const div = document.createElement("li")
+            const div = document.createElement("div")
+            div.className = "users"
+            div.id = `${element.login}`
             const h4 = document.createElement("h4")
             h4.textContent = element.login
             const img = document.createElement("img")
@@ -25,10 +22,42 @@ function renderData() {
             div.append(h4, img)
             userList.append(div)
         })
+        expandUser()
     })
+}*/
+
+//working renderData with separate createUser
+function renderData() {
+    console.log('Ready to render')
+    let userList = document.querySelector("#user-list")
+       //regular fetch to render data 
+    fetch(`${userSearchURL}+${param}`, {
+        headers: {
+            "Accept": "application/vnd.github.v3+json"
+        }
+    }).then(res => res.json()).then(data => {
+        data.items.forEach((element) => {
+            userList.append(createUser(element))
+    })})
+    expandUser()
+}
+
+function createUser(element) {
+    const div = document.createElement("div")
+    div.className = "users"
+    div.id = `${element.login}`
+    const h4 = document.createElement("h4")
+    h4.textContent = element.login
+    const img = document.createElement("img")
+    img.className = "avatar"
+    img.src = element.avatar_url
+    const p = document.createElement("p")
+    div.append(h4, img)
+    return div
 }
 
 function searchUser() {
+    console.log('Ready to search')
     const form = document.querySelector("#github-form")
     console.log(form)
     form.addEventListener('submit', (e)=> {
@@ -44,7 +73,31 @@ function domLoaded() {
     console.log("DOM Loaded")
     renderData()
     searchUser()
+
     })
 }
+
+function expandUser() {
+    const userList = document.querySelector("#user-list")
+    userList.addEventListener("click", (e)=> {
+    const userName = e.target.parentNode.childNodes[0].textContent
+    fetch(`https://api.github.com/users/${userName}/repos`,{
+        headers: {
+            "Accept": "application/vnd.github.v3+json"
+        }
+    }).then(res=> res.json()).then(data => {
+        const userLoc = document.querySelector(`#${userName}`)
+        const repoData = data.forEach((element) => {
+            const repoItem = document.createElement('li')
+            const a = document.createElement('a')
+            a.href = ` ${element.html_url} `
+            a.className = 'url'
+            const aText = document.createTextNode(` ${element.name} `)
+            a.appendChild(aText)
+            //console.log(a)
+            repoItem.append(a)
+            userLoc.append(repoItem)
+        })
+})})}
 
 domLoaded()
